@@ -1,0 +1,158 @@
+<aura:component controller="LookupSObjectController" >
+    <!-- Required Scripts/Styles -->
+    <!-- Salesforce Lightning Design System : https://www.lightningdesignsystem.com/ -->
+   
+    <!-- Attributes -->
+    <aura:attribute name="required" type="Boolean" default="false" />
+    <aura:attribute name="sObjectAPIName" type="String" required="true" description="The API name of the SObject to search" />
+    <aura:attribute name="label" type="String" required="true" description="The label to assign to the lookup, eg: Account" />
+    <aura:attribute name="iconType" type="String" required="true" description="The icon to assign to the lookup, eg: account must be lowercase" />
+
+    <aura:attribute name="parentRecordId" type="String" />
+    
+    <aura:attribute name="addFields" type="List" default="phone,email" />
+    <aura:attribute name="sobjectLabel" type="String" required="true" description="The Sobject Name to assign to the lookup, eg: Account" />
+    <aura:attribute name="pluralLabel" type="String" required="true" description="The plural label to assign to the lookup, eg: Accounts" />
+    <aura:attribute name="objectTitle" type="String" default='' />
+    <aura:attribute name="rowLimit" type="Integer" default="10" />
+
+    <aura:attribute name="searchString" type="String" description="The search string to find." />
+    <aura:attribute name="hasResults" type="boolean" default="false" description="True or False if the search returns results" />
+    <aura:attribute name="matches" type="LookupSObjectController.Result[]" description="The resulting matches returned by the Apex controller." />
+    <aura:attribute name="selectedRecord" type="Id" default="fasle" description="Holds the seleced Id Record" />
+    <aura:attribute name="selectedIsRecord" type="boolean" default="false" description="True or False if record Is selected" />
+    <aura:attribute name="pillFields" type='SObject' />
+    <aura:attribute name="pillFieldz" type='Object' />
+    <aura:dependency resource="markup://force:createRecord" type="EVENT"/>
+
+    <aura:handler name="change" value="{!v.selectedRecord}" action="{!c.handlePillFieldId}" />
+    
+    <!-- <aura:handler name="changes" value="{!v.pillFields}" action="{!c.handlePillFields}" /> -->
+
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+
+    <aura:attribute name="recordError" type="String" />
+<!--
+    <div aura:id="fieldRequired" class="slds-form-element ">
+
+        
+
+
+  <div class="slds-form-element__control">
+
+-->
+    <div aura:id="lookuplistWrapper" class="slds-combobox_container slds-has-inline-listbox" style="border:none;">
+      <div aura:id="lookuplistContainer" class="slds-combobox slds-dropdown-trigger slds-dropdown-trigger_click slds-combobox-lookup" 
+        aria-expanded="{!v.hasResults}" 
+        aria-haspopup="listbox" 
+        role="combobox" style="padding:0;">
+
+        
+            <force:recordData aura:id="forceRecordCmp"
+                recordId="{!v.selectedRecord}"
+                targetError="{!v.recordError}"
+                layoutType="FULL"
+                mode="VIEW"
+                targetRecord="{!v.pillFields}"
+                recordUpdated="{!c.handlePillFields}"
+            />
+
+         
+            <aura:if isTrue="{!v.selectedIsRecord}">
+                  <label class="slds-form-element__label" for="combobox-unique-id">
+                    <aura:if isTrue="{!v.required}" >
+                        <abbr class="slds-required" title="required">*</abbr> 
+                    </aura:if>
+                    {!v.label}</label>
+                <div class="slds-combobox_container slds-has-inline-listbox" >
+                <div aura:id="pillWrapper" class="slds-combobox__form-element slds-p-around_xx-small" role="none">
+
+                    <lightning:pill label="{!v.pillFields.fields.Name.value}"
+                                title="{!v.pillFields.fields.Name.value +'  ' +v.pillFields.fields.Phone.value + '  ' + v.pillFields.fields.Email.value}" 
+                                aura:id="lookup-pill"
+                                onremove="{!c.clear}"
+                                class="slds-media slds-listbox__option">
+                        <aura:set attribute="media">
+                            <lightning:icon iconName="{! 'standard:'+ v.iconType}" size="x-small" alternativeText="{!v.label}"/>
+                        </aura:set>
+                    </lightning:pill>        
+                </div>
+            </div>
+                <aura:set attribute="else">
+                    
+                    <lightning:input aura:id="lookup" 
+                        name="primaryContact" 
+                        label="{!v.label}"
+                        value="{!v.searchString}"
+                        placeholder="{!'Search ' + v.pluralLabel}"
+                        minlength="2"
+                        class="slds-input slds-combobox__input slds-p-horizontal_none" 
+                        onchange="{!c.search}"
+                        isLoading="{!v.selectedIsRecord}" 
+                        required="{!v.required}"
+                        type="search"
+                    />
+
+                    <!--
+                    <ui:inputText aura:id="lookup" value="{!v.searchString}" placeholder="{!'Search ' + v.pluralLabel}" class="slds-input slds-combobox__input" updateOn="keyup" keyup="{!c.search}" />
+                    
+                    <lightning:icon iconName="utility:search"  alternativeText="Search" size="x-small" class="slds-input__icon"/>
+                    -->
+                </aura:set>
+            </aura:if>
+        <!-- </div> -->
+
+        <div id="listbox-unique-id" role="listbox">
+            <ul class="slds-listbox slds-listbox_vertical slds-dropdown slds-dropdown_fluid" role="presentation">
+                <div class="slds-lookup__item">
+                    <lightning:button variant="base"
+                        label="{! '&quot;' + v.searchString + '&quot; in '+ v.pluralLabel}"
+                        iconName="utility:search"
+                    />
+                </div>
+
+                <aura:iteration items="{!v.matches}" var="match" indexVar="indx" >
+                    <li role="presentation" class="slds-listbox__item">
+                        <span 
+                            class="slds-media slds-listbox__option slds-listbox__option_entity slds-listbox__option_has-meta" 
+                            role="option"
+                            id="{!globalId + '_id_' + match.SObjectId+'_'+indx}" 
+                            onclick="{!c.select}"
+                            >
+                            <lightning:icon iconName="{!'standard:'+ v.iconType}" size="small" alternativeText="{!v.label}" class="slds-media__figure" />  
+                            <span class="slds-media__body">
+                                <span class="slds-listbox__option-text slds-listbox__option-text_entity">{!match.SObjectLabel}</span>
+                                <span class="slds-listbox__option-meta slds-listbox__option-meta_entity">{!match.phone +' ' + match.email}</span>
+                            </span>
+                        </span>
+                    </li>
+                </aura:iteration>
+                <div class="slds-lookup__item">
+                    <aura:if isTrue="{! v.searchString != false}">
+                        <aura:if isTrue="{!v.hasResults == false}" >
+                            <h3>Aucun Resultas Cree un nouveau {!v.sobjectLabel}</h3>
+                            <c:NewContactModalComponent accountId="{!v.parentRecordId}" newRecordId="{!v.selectedRecord}" createdRec="{!v.selectedIsRecord}" searchString="{!v.searchString}" newContactModalConfirm=""/>
+                        </aura:if>
+                    </aura:if>
+
+                   <!-- <lightning:button variant="base"
+                        label="{! 'Add New ' + v.sobjectLabel }"
+                        iconName="utility:add"
+                        onclick="{!c.createRecord}"
+                    /> -->
+                </div>
+            </ul>
+        </div>
+
+      </div>
+    </div>
+
+
+
+
+<!--
+      </div>
+</div>
+-->
+
+</aura:component>
