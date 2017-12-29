@@ -11,18 +11,18 @@ This component will mimics a lookup field for any lightning component / applicat
 2. - Set optional Paramaters
 
 <c:sObjectLookup label="Contact Primarire" 
-                                    sobjectLabel="Contact" 
-                                    required="true"
-                                    pluralLabel="Contacts" 
-                                    iconType="contact" 
-                                    sObjectAPIName="Contact"
-                                    rowLimit="5" // Optional (if it's not set it will default to 10)
-                                    selectedRecord="{!v.contact1RecordId}"
-                                    parentRecordId="{!v.accountRecordId}" // Optional can be used with custom record creators that requires a parent id.
-                                    required="true" // Optional Boolean that ensures the field is required to save.
-                                    addFields="phone,email" // optional sets additional fields to query. String value with commas between fieldApiNames
-                                />
+                 sobjectLabel="Contact" 
+                 required="true"
+                 pluralLabel="Contacts" 
+                 iconType="contact" 
+                 sObjectAPIName="Contact"
+                 rowLimit="5" // Optional (if it's not set it will default to 10)
+                 selectedRecord="{!v.contact1RecordId}"
+                 parentRecordId="{!v.accountRecordId}" // Optional can be used with custom record creators that requires a parent id.
+                 required="true" // Optional Boolean that ensures the field is required to save.
+                 addFields="phone,email" // optional sets additional fields to query. String value with commas between fieldApiNames
+/>
 
 ### Support or Contact
 
-Having trouble with this component?  [emailMe](mailto:ino@websbybwills.com) and we’ll help you sort it out.
+Having trouble with this component?  [Email Me](mailto:ino@websbybwills.com) and we’ll help you sort it out.
