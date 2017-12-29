@@ -1,0 +1,85 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes" access="global" controller="CampaignMemberLightningController" >
+    <aura:attribute name="memberList" type="List" default="[]" />
+    <aura:attribute name="listStartPos" type="Integer" default="0" />
+    <aura:attribute name="listEndPos" type="Integer" default="20" />
+    <aura:attribute name="totalMembers" type="Integer" default="0" /> 
+    <aura:attribute name="selectedValue" type="Integer" default="20"/>
+    <aura:attribute name="pageNumbers" type="List" default="[]" />
+    <aura:attribute name="currentPage" type="Integer" default="0" /> 
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+    <lightning:workspaceAPI aura:id="rafaleWorkspace" />
+    
+    <lightning:card iconName="standard:campaign" >
+    	<aura:set attribute="title" >
+        	Campaign Member List
+        </aura:set>
+        <aura:set attribute="actions">
+    		<lightning:select name="itemsToDisplay" onchange="{!c.itemsToDisplayChange}" label="{!'Display of '+ v.totalMembers}" aura:id="itemsToDisplay" value="{!v.selectedValue}">
+        		<aura:iteration items="10,20,50,100" var="item">
+            		<option text="{!item}" value="{!item}"/>
+         		</aura:iteration>
+    		</lightning:select>
+        </aura:set>
+        
+        <lightning:buttonGroup class="slds-p-around_medium">
+            <aura:iteration items="{!v.pageNumbers}" var="item">
+                <aura:if isTrue="{!item == v.currentPage}" >
+                		<lightning:button value="{!item}" label="{!item+1}" onclick="{!c.handlePageClick}" variant="brand" />
+                	<aura:set attribute="else">
+                    	<lightning:button value="{!item}" label="{!item+1}" onclick="{!c.handlePageClick}"/>
+                    </aura:set>
+                </aura:if>
+                
+            </aura:iteration>
+        </lightning:buttonGroup>
+
+        <div class="slds-scrollable_y" style="height: 50rem;">
+        <aura:iteration items="{!v.memberList}" 
+                        var="item" 
+                        start="{!v.listStartPos}"
+                        end="{!v.listEndPos}"
+                        >
+            
+            <lightning:tile title="{!item.Name}" 
+                            
+                            class="slds-p-horizontal_medium tileHOver" 
+                            href="{!'#/sObject/' + item.id + '/view'}"
+                            >
+		        <aura:set attribute="media">
+                    <aura:if isTrue="{!item.Type == 'Lead'}" >
+            			<lightning:icon iconName="standard:lead" size="small" />
+                    	<aura:set attribute="else">
+                    		<lightning:icon iconName="standard:contact" size="small" />        
+                    	</aura:set>
+                    </aura:if>
+        		</aura:set>
+        		<dl class="slds-dl_horizontal tileHOver" >
+            		<dt class="slds-dl_horizontal__label">                   
+                        <p class="slds-truncate" title="Name">Name:</p>               		
+            		</dt>
+            		<dd class="slds-dl_horizontal__detail slds-tile__meta">
+                		<p class="slds-truncate" style="color:blue" title="{!item.Name}" id="{!item.Id}" onclick="{!c.handleTileClick}">
+                            {!item.Name}
+                        </p>
+            		</dd>
+            		<dt class="slds-dl_horizontal__label">
+                		<p class="slds-truncate" title="Company">Company:</p>
+            		</dt>
+            		<dd class="slds-dl_horizontal__detail slds-tile__meta">
+                		<p class="slds-truncate" title="{!item.CompanyOrAccount}">{!item.CompanyOrAccount}</p>
+                	</dd>
+                    <dt class="slds-dl_horizontal__label">
+                		<p class="slds-truncate" title="Status">Status:</p>
+            		</dt>
+            		<dd class="slds-dl_horizontal__detail slds-tile__meta">
+                		<p class="slds-truncate" title="{!item.Status}">{!item.Status}</p>
+                	</dd>
+       		 	</dl>                
+            </lightning:tile>
+        	
+    	</aura:iteration>
+        </div>
+        
+        
+    </lightning:card>
+</aura:component>
