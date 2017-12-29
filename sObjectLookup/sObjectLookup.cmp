@@ -130,16 +130,15 @@
                 <div class="slds-lookup__item">
                     <aura:if isTrue="{! v.searchString != false}">
                         <aura:if isTrue="{!v.hasResults == false}" >
-                            <h3>Aucun Resultas Cree un nouveau {!v.sobjectLabel}</h3>
-                            <c:NewContactModalComponent accountId="{!v.parentRecordId}" newRecordId="{!v.selectedRecord}" createdRec="{!v.selectedIsRecord}" searchString="{!v.searchString}" newContactModalConfirm=""/>
-                        </aura:if>
-                    </aura:if>
-
-                   <!-- <lightning:button variant="base"
+                            <lightning:button variant="base"
                         label="{! 'Add New ' + v.sobjectLabel }"
                         iconName="utility:add"
                         onclick="{!c.createRecord}"
-                    /> -->
+                    />
+                        </aura:if>
+                    </aura:if>
+
+                   <!--  -->
                 </div>
             </ul>
         </div>
