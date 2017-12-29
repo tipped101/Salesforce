@@ -10,7 +10,7 @@ This component will mimics a lookup field for any lightning component / applicat
 ```
 2. Set optional Paramaters
 ```xml
-<c:sObjectLookup label="Contact Primarire" 
+<c:sObjectLookup label="Contact 1" 
     sobjectLabel="Contact" 
     required="true"
     pluralLabel="Contacts" 
